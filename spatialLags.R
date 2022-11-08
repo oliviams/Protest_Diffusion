@@ -2,8 +2,8 @@ library(dplyr)
 
 # Adding spatial lag using distance in km between locations (calculated from coordinates)
 
-protest.data <- read.csv("~/Dropbox/elements/OliviaMS/Protest Diffusion/weekly_protests.csv")
-dist.matrix <- read.csv("~/Dropbox/elements/OliviaMS/Protest Diffusion/dist_matrix_geoid.csv")
+protest.data <- read.csv("~/data/final_weekly_data.csv")
+dist.matrix <- read.csv("~/data/dist_matrix_geoid.csv")
 
 # Column and row names into correct format
 geoID <- dist.matrix[,1]
