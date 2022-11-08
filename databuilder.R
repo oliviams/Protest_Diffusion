@@ -9,7 +9,7 @@ library(rnaturalearthdata)
 # Overlaying protest coordinates on shapefile of US urban areas so that US Census population data can be used 
 # Protest data from ACLED: https://acleddata.com/data-export-tool/
 # US Census data from: https://data.census.gov/cedsci/table?tid=ACSDP5Y2020.DP05
-# Shapefile is too large to upload, but is retrieved from: https://catalog.data.gov/dataset/tiger-line-shapefile-2017-2010-nation-u-s-2010-census-urban-area-national
+# Shapefile from: https://catalog.data.gov/dataset/tiger-line-shapefile-2017-2010-nation-u-s-2010-census-urban-area-national
 
 							
 us.map.sp <- readShapeSpatial("~/data/tl_2017_us_uac10/tl_2017_us_uac10.shp",proj4string=CRS("+proj=longlat +ellps=WGS84")) # US urban areas shapefile 
