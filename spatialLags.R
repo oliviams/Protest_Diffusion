@@ -2,8 +2,8 @@ library(dplyr)
 
 # Adding spatial lag using distance in km between locations (calculated from coordinates)
 
-protest.data <- read.csv("~/data/final_weekly_data.csv")
-dist.matrix <- read.csv("~/data/dist_matrix_geoid.csv")
+protest.data <- read.csv("./data/final_weekly_data.csv")
+dist.matrix <- read.csv("./data/dist_matrix_geoid.csv")
 
 # Column and row names into correct format
 geoID <- dist.matrix[,1]
@@ -40,3 +40,4 @@ output <- output[-1,]
 # Joining spatial lag data to protest data 
 protest.data <- left_join(protest.data,output,by=c("GEOID10"="GEOID10","Year.Week"="Year.Week"))
 
+write.csv(protest.data,file="./data/weekly_data_lagged.csv")
