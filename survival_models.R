@@ -95,9 +95,23 @@ blm <- add_duration(blm, y="Protest._x", unitID = "NAME10_x", tID = "year_synth"
 
 blm <- blm[is.na(blm$White_x)==FALSE,]
 
-weib_model <- spdur(duration ~  Black.or.African.American_x, atrisk ~ 1 ,data = blm, distr = "weibull")
+weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
+													Temp.spatial.first.event..same.state.+
+													Temp.spatial.first.event..non.state.+
+													log(Total.population_x)+
+													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
+													I(Temp.spatial.first.event..same.state.*log(Total.population_x))+
+													I(Temp.spatial.first.event..non.state.*log(Total.population_x)), atrisk ~ 1 ,data = blm, distr = "weibull")
 		 
-
+loglog_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
+													Temp.spatial.first.event..same.state.+
+													Temp.spatial.first.event..non.state.+
+													log(Total.population_x)+
+													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
+													I(Temp.spatial.first.event..same.state.*log(Total.population_x))+
+													I(Temp.spatial.first.event..non.state.*log(Total.population_x)), atrisk ~ 1 ,data = blm, distr = "loglog")
+													
+													
 weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x+Protests.same.state.past.week...50km_x+log(Total.population_x), atrisk ~ 1 ,data = blm, distr = "weibull")
 
 weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x+Protests.same.state.past.week...50km_x+Protests.past.week.not.same.state_x+log(Total.population_x)+Median.age..years._x, atrisk ~ 1 + log(Total.population_x) +White_x,data = blm, distr = "weibull")
