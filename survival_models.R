@@ -7,7 +7,7 @@ options(scipen=999)
 
 blm <- read.csv("~/Downloads/blm_weekly_first_gf-2.csv")
 
-blm <- blm[,c("Total.population_x","Protests.under.50km.past.week_x","Protests.same.state.past.week...50km_x","Protests.past.week.not.same.state_x","Black.or.African.American_x","White_x","Median.age..years._x","HBCU_x","Total.housing.units_x","Weeks.since.GF","State_x","NAME10_x","Protest._x","Not.immune","Time.since.first.event","Temp.spatial.first.event..all.","Temp.spatial.last.event..all.","Temp.spatial.first.event...50km.","Temp.spatial.last.event...50km.","Temp.spatial.first.event..same.state.","Temp.spatial.last.event..same.state.","Temp.spatial.first.event..state..50km.","Temp.spatial.first.event..non.state.","Temp.spatial.last.event..state..50km.","Temp.spatial.last.event..non.state.","Time.to.first.BLM.protest.since.GF")]
+blm <- blm[,c("Total.population_x","Protests.under.50km.past.week_x","Protests.same.state.past.week...50km_x","Protests.past.week.not.same.state_x","Black.or.African.American_x","White_x","Median.age..years._x","HBCU_x","Total.housing.units_x","Weeks.since.GF","State_x","NAME10_x","Protest._x","Not.immune","Time.since.first.event","Temp.spatial.first.event..all.","Temp.spatial.last.event..all.","Temp.spatial.first.event...50km.","Temp.spatial.last.event...50km.","Temp.spatial.first.event..state..50km.","Temp.spatial.last.event..state..50km.","Temp.spatial.first.event..state..50km.","Temp.spatial.first.event..non.state.","Temp.spatial.last.event..state..50km.","Temp.spatial.last.event..non.state.","Time.to.first.BLM.protest.since.GF")]
 
 
 blm$start.date <- blm$Weeks.since.GF-1
@@ -37,55 +37,92 @@ surv_model <-  coxph(Surv(start.date,end.date,Protest._x) ~ Total.population_x*P
                Median.age..years._x + HBCU_x + Total.housing.units_x, data = blm)
 summary(surv_model)
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+Temp.spatial.last.event..same.state.+Temp.spatial.last.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+Temp.spatial.last.event..state..50km.+Temp.spatial.last.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+Temp.spatial.first.event..same.state.+Temp.spatial.first.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+Temp.spatial.first.event..state..50km.+Temp.spatial.first.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+
-													Temp.spatial.last.event..same.state.+
-													Temp.spatial.last.event..non.state.+
+
+
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event..all.+
 													log(Total.population_x)+
+													I(Temp.spatial.first.event..all.*log(Total.population_x))+
 													Black.or.African.American_x+ 
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
+
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event..all.+
+													log(Total.population_x)+
+													I(Temp.spatial.last.event..all.*log(Total.population_x))+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+summary(surv_model)
+
+
+
 surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..same.state.+
+													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
 													log(Total.population_x)+
-													Black.or.African.American_x+
-													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
-
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+
-													Temp.spatial.last.event..same.state.+
-													Temp.spatial.last.event..non.state.+
-													log(Total.population_x)+
-													I(Temp.spatial.last.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.last.event..same.state.*log(Total.population_x))+
-													I(Temp.spatial.last.event..non.state.*log(Total.population_x))+
 													Black.or.African.American_x+ 
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
 surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..same.state.+
+													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
 													log(Total.population_x)+
 													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..same.state.*log(Total.population_x))+
+													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
 													I(Temp.spatial.first.event..non.state.*log(Total.population_x))+
 													Black.or.African.American_x+
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
 
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
+													Temp.spatial.first.event..state..50km.+
+													Temp.spatial.first.event..non.state.+
+													log(Total.population_x)+
+													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
+													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
+													I(Temp.spatial.first.event..non.state.*log(Total.population_x))+
+													Black.or.African.American_x+
+													White_x+Median.age..years._x, data = blm)
+summary(surv_model)
 
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+Temp.spatial.first.event..same.state.+Temp.spatial.first.event..non.state.+Temp.spatial.last.event...50km.+Temp.spatial.last.event..same.state.+Temp.spatial.last.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+
+
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+
+													Temp.spatial.last.event..state..50km.+
+													Temp.spatial.last.event..non.state.+
+													log(Total.population_x)+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+summary(surv_model)
+
+
+
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+
+													Temp.spatial.last.event..state..50km.+
+													Temp.spatial.last.event..non.state.+
+													log(Total.population_x)+
+													I(Temp.spatial.last.event...50km.*log(Total.population_x))+
+													I(Temp.spatial.last.event..state..50km.*log(Total.population_x))+
+													I(Temp.spatial.last.event..non.state.*log(Total.population_x))+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+summary(surv_model)
+
+
+
+
+
+
+surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+Temp.spatial.first.event..state..50km.+Temp.spatial.first.event..non.state.+Temp.spatial.last.event...50km.+Temp.spatial.last.event..state..50km.+Temp.spatial.last.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
 
@@ -96,19 +133,20 @@ blm <- add_duration(blm, y="Protest._x", unitID = "NAME10_x", tID = "year_synth"
 blm <- blm[is.na(blm$White_x)==FALSE,]
 
 weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..same.state.+
+													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
 													log(Total.population_x)+
 													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..same.state.*log(Total.population_x))+
-													I(Temp.spatial.first.event..non.state.*log(Total.population_x)), atrisk ~ 1 ,data = blm, distr = "weibull")
+													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
+													I(Temp.spatial.first.event..non.state.*log(Total.population_x))+Black.or.African.American_x+ 
+													White_x+Median.age..years._x, atrisk ~ 1 ,data = blm, distr = "weibull")
 		 
 loglog_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..same.state.+
+													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
 													log(Total.population_x)+
 													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..same.state.*log(Total.population_x))+
+													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
 													I(Temp.spatial.first.event..non.state.*log(Total.population_x)), atrisk ~ 1 ,data = blm, distr = "loglog")
 													
 													
