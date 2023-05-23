@@ -4,118 +4,286 @@ library(dplyr)
 library(survival)
 library(spduration)
 options(scipen=999)
+library(simPH)
 
 blm <- read.csv("~/Downloads/blm_weekly_first_gf-2.csv")
 
 blm <- blm[,c("Total.population_x","Protests.under.50km.past.week_x","Protests.same.state.past.week...50km_x","Protests.past.week.not.same.state_x","Black.or.African.American_x","White_x","Median.age..years._x","HBCU_x","Total.housing.units_x","Weeks.since.GF","State_x","NAME10_x","Protest._x","Not.immune","Time.since.first.event","Temp.spatial.first.event..all.","Temp.spatial.last.event..all.","Temp.spatial.first.event...50km.","Temp.spatial.last.event...50km.","Temp.spatial.first.event..state..50km.","Temp.spatial.last.event..state..50km.","Temp.spatial.first.event..state..50km.","Temp.spatial.first.event..non.state.","Temp.spatial.last.event..state..50km.","Temp.spatial.last.event..non.state.","Time.to.first.BLM.protest.since.GF")]
 
 
+blm$Total.population_x.log <- log(blm$Total.population_x)
+
 blm$start.date <- blm$Weeks.since.GF-1
 blm$end.date <- blm$Weeks.since.GF
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Total.population_x + Protests.under.50km.past.week_x + Protests.same.state.past.week...50km_x + Protests.past.week.not.same.state_x + 
-               Black.or.African.American_x + White_x +
-               Median.age..years._x + HBCU_x + Total.housing.units_x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
-
-
-surv_model <-  coxph(Surv(start.date,end.date,Protest._x) ~ Total.population_x*Protests.under.50km.past.week_x + Total.population_x*Protests.same.state.past.week...50km_x +
-               Total.population_x*Protests.past.week.not.same.state_x + 
-               Black.or.African.American_x + White_x +
-               Median.age..years._x + HBCU_x + Total.housing.units_x, data = blm)
-summary(surv_model)
-
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Total.population_x + Protests.under.50km.past.week_x + Protests.same.state.past.week...50km_x + Protests.past.week.not.same.state_x + 
-               Black.or.African.American_x + White_x +
-               Median.age..years._x + HBCU_x + Total.housing.units_x, data = blm)
-summary(surv_model)
-
-
-surv_model <-  coxph(Surv(start.date,end.date,Protest._x) ~ Total.population_x*Protests.under.50km.past.week_x + Total.population_x*Protests.same.state.past.week...50km_x +
-               Total.population_x*Protests.past.week.not.same.state_x + 
-               Black.or.African.American_x + White_x +
-               Median.age..years._x + HBCU_x + Total.housing.units_x, data = blm)
-summary(surv_model)
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+Temp.spatial.last.event..state..50km.+Temp.spatial.last.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+Temp.spatial.first.event..state..50km.+Temp.spatial.first.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
 
 
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event..all.+
-													log(Total.population_x)+
-													I(Temp.spatial.first.event..all.*log(Total.population_x))+
+surv_model.1.all <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event..all.*blm$Total.population_x.log+
 													Black.or.African.American_x+ 
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event..all.+
-													log(Total.population_x)+
-													I(Temp.spatial.last.event..all.*log(Total.population_x))+
-													Black.or.African.American_x+ 
-													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
-
-
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
+surv_model.1.cat <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
 													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
-													log(Total.population_x)+
+													Total.population_x.log+
 													Black.or.African.American_x+ 
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
+
+model.data <- model.frame(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
 													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
-													log(Total.population_x)+
-													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..non.state.*log(Total.population_x))+
+													Total.population_x.log+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = mean(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			
+			plot.data <- bind_rows(plot.list)		
+
+				plot.data$Temp.spatial.first.event...50km. <- seq(min(model.data$Temp.spatial.first.event...50km.),max(model.data$Temp.spatial.first.event...50km.),length=100)
+
+
+pred.model <- predict(surv_model.1.cat,type="risk",se.fit=TRUE,newdata=plot.data)
+
+plot.data$fit <- pred.model$fit
+plot.data$se.fit <- pred.model$se.fit
+plot.data$hi95 <- plot.data$fit+1.96*plot.data$se.fit
+plot.data$lo95 <- plot.data$fit-1.96*plot.data$se.fit
+
+
+p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event...50km.))+
+		#geom_point()+
+			geom_line()+
+				geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
+					theme_minimal()
+
+
+#######################################
+#######################################
+
+surv_model.2.cat <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
 													Black.or.African.American_x+
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
 summary(surv_model)
 
 
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..state..50km.+
-													Temp.spatial.first.event..non.state.+
-													log(Total.population_x)+
-													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..non.state.*log(Total.population_x))+
+
+
+model.data <- model.frame(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
+													Black.or.African.American_x+
+													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = min(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			plot.data <- bind_rows(plot.list)		
+					plot.data$Temp.spatial.first.event...50km. <- seq(min(model.data$Temp.spatial.first.event...50km.),max(model.data$Temp.spatial.first.event...50km.),length=100)
+					
+			plot.data.1 <- plot.data
+
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = max(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			plot.data <- bind_rows(plot.list)		
+					plot.data$Temp.spatial.first.event...50km. <- seq(min(model.data$Temp.spatial.first.event...50km.),max(model.data$Temp.spatial.first.event...50km.),length=100)
+					
+			plot.data.2 <- plot.data
+
+			plot.data <- bind_rows(plot.data.1,plot.data.2)	
+
+pred.model <- predict(surv_model.2.cat,type="risk",se.fit=TRUE,newdata=plot.data)
+
+plot.data$fit <- pred.model$fit
+plot.data$se.fit <- pred.model$se.fit
+plot.data$hi95 <- plot.data$fit+1.96*plot.data$se.fit
+plot.data$lo95 <- plot.data$fit-1.96*plot.data$se.fit
+
+
+plot.data$groups <- as.factor(plot.data$Total.population_x.log)
+
+p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event...50km.,group=groups,colour=groups,fill=groups))+
+		#geom_point()+
+			geom_line()+
+				geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
+					theme_minimal()
+
+
+####################################
+####################################
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = min(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			plot.data <- bind_rows(plot.list)		
+					plot.data$Temp.spatial.first.event..state..50km. <- seq(min(model.data$Temp.spatial.first.event..state..50km.),max(model.data$Temp.spatial.first.event..state..50km.),length=100)
+					
+			plot.data.1 <- plot.data
+
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = max(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			plot.data <- bind_rows(plot.list)		
+					plot.data$Temp.spatial.first.event..state..50km. <- seq(min(model.data$Temp.spatial.first.event..state..50km.),max(model.data$Temp.spatial.first.event..state..50km.),length=100)
+					
+			plot.data.2 <- plot.data
+
+			plot.data <- bind_rows(plot.data.1,plot.data.2)	
+
+pred.model <- predict(surv_model.2.cat,type="risk",se.fit=TRUE,newdata=plot.data)
+
+plot.data$fit <- pred.model$fit
+plot.data$se.fit <- pred.model$se.fit
+plot.data$hi95 <- plot.data$fit+1.96*plot.data$se.fit
+plot.data$lo95 <- plot.data$fit-1.96*plot.data$se.fit
+
+
+plot.data$groups <- as.factor(plot.data$Total.population_x.log)
+
+p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event..state..50km.,group=groups,colour=groups,fill=groups))+
+		#geom_point()+
+			geom_line()+
+				geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
+					theme_minimal()
+
+
+####################################
+####################################
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = min(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			plot.data <- bind_rows(plot.list)		
+					plot.data$Temp.spatial.first.event..non.state. <- seq(min(model.data$Temp.spatial.first.event..non.state.),max(model.data$Temp.spatial.first.event..non.state.),length=100)
+					
+			plot.data.1 <- plot.data
+
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = max(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			plot.data <- bind_rows(plot.list)		
+					plot.data$Temp.spatial.first.event..non.state. <- seq(min(model.data$Temp.spatial.first.event..non.state.),max(model.data$Temp.spatial.first.event..non.state.),length=100)
+					
+			plot.data.2 <- plot.data
+
+			plot.data <- bind_rows(plot.data.1,plot.data.2)	
+
+pred.model <- predict(surv_model.2.cat,type="risk",se.fit=TRUE,newdata=plot.data)
+
+plot.data$fit <- pred.model$fit
+plot.data$se.fit <- pred.model$se.fit
+plot.data$hi95 <- plot.data$fit+1.96*plot.data$se.fit
+plot.data$lo95 <- plot.data$fit-1.96*plot.data$se.fit
+
+
+plot.data$groups <- as.factor(plot.data$Total.population_x.log)
+
+p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event..non.state.,group=groups,colour=groups,fill=groups))+
+		#geom_point()+
+			geom_line()+
+				geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
+					theme_minimal()
+
+
+####################################
+####################################
+
+
+
+
+
+
+
+
+surv_model.3.cat <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
 													Black.or.African.American_x+
 													White_x+Median.age..years._x, data = blm)
 summary(surv_model)
 
 
-
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+
-													Temp.spatial.last.event..state..50km.+
-													Temp.spatial.last.event..non.state.+
-													log(Total.population_x)+
-													Black.or.African.American_x+ 
-													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
-
-
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.last.event...50km.+
-													Temp.spatial.last.event..state..50km.+
-													Temp.spatial.last.event..non.state.+
-													log(Total.population_x)+
-													I(Temp.spatial.last.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.last.event..state..50km.*log(Total.population_x))+
-													I(Temp.spatial.last.event..non.state.*log(Total.population_x))+
-													Black.or.African.American_x+ 
-													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
 
 
 
@@ -132,15 +300,71 @@ blm <- add_duration(blm, y="Protest._x", unitID = "NAME10_x", tID = "year_synth"
 
 blm <- blm[is.na(blm$White_x)==FALSE,]
 
-weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..state..50km.+
-													Temp.spatial.first.event..non.state.+
-													log(Total.population_x)+
-													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..non.state.*log(Total.population_x))+Black.or.African.American_x+ 
+weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
+													Black.or.African.American_x+ 
 													White_x+Median.age..years._x, atrisk ~ 1 ,data = blm, distr = "weibull")
-		 
+													
+
+
+
+
+model.data <- model.frame(duration ~  Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x,data = blm)
+
+plot.data <- model.data %>%
+				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
+													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
+													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
+													Total.population_x.log = mean(Total.population_x.log),
+													Black.or.African.American_x = mean(Black.or.African.American_x),
+													White_x = mean(White_x),
+													Median.age..years._x = mean(Median.age..years._x))
+					
+			plot.list <- list()
+				for(i in 1:100){
+					plot.list[[i]] <- plot.data
+				}
+			
+			plot.data <- bind_rows(plot.list)		
+
+				plot.data$Temp.spatial.first.event...50km. <- seq(min(model.data$Temp.spatial.first.event...50km.),max(model.data$Temp.spatial.first.event...50km.),length=100)
+
+
+plot.data$atrisk <- 1
+plot.data$cured <- 0
+plot.data$t.0 <- 5
+plot.data$duration <- 6
+plot.data$ongoing <- 0
+plot.data$end.spell <- 1
+plot.data$censor <- 0
+plot.data$failure <- 1
+plot.data$fit <- predict(weib_model,newdata=plot.data)
+
+
+#plot.data$se.fit <- pred.model$se.fit
+#plot.data$hi95 <- plot.data$fit+1.96*plot.data$se.fit
+#plot.data$lo95 <- plot.data$fit-1.96*plot.data$se.fit
+
+
+p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event...50km.))+
+		#geom_point()+
+			geom_line()+
+				#geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
+					theme_minimal()
+
+
+
+
+
+
+
+
+test <- predict(weib_model)	 
 loglog_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
 													Temp.spatial.first.event..state..50km.+
 													Temp.spatial.first.event..non.state.+
