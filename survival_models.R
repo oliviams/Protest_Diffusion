@@ -5,7 +5,7 @@ library(survival)
 library(spduration)
 options(scipen=999)
 library(simPH)
-`
+
 blm <- read.csv("~/Downloads/blm_weekly_first_gf-2.csv")
 
 blm <- blm[,c("Total.population_x","Protests.under.50km.past.week_x","Protests.same.state.past.week...50km_x","Protests.past.week.not.same.state_x","Black.or.African.American_x","White_x","Median.age..years._x","HBCU_x","Total.housing.units_x","Weeks.since.GF","State_x","NAME10_x","Protest._x","Not.immune","Time.since.first.event","Temp.spatial.first.event..all.","Temp.spatial.last.event..all.","Temp.spatial.first.event...50km.","Temp.spatial.last.event...50km.","Temp.spatial.first.event..state..50km.","Temp.spatial.last.event..state..50km.","Temp.spatial.first.event..state..50km.","Temp.spatial.first.event..non.state.","Temp.spatial.last.event..state..50km.","Temp.spatial.last.event..non.state.","Time.to.first.BLM.protest.since.GF")]
@@ -16,7 +16,6 @@ blm$Total.population_x.log <- log(blm$Total.population_x)
 blm$start.date <- blm$Weeks.since.GF-1
 blm$end.date <- blm$Weeks.since.GF
 
-`
 
 surv_model.1.all <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event..all.*blm$Total.population_x.log+
 													Black.or.African.American_x+ 
@@ -56,13 +55,9 @@ summary(surv_model.3.cat)
 source('~/Documents/git/Protest_Diffusion/surv_model_3_cat_plot.R', chdir = TRUE)
 
 
-
-
-
-
-
-surv_model <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+Temp.spatial.first.event..state..50km.+Temp.spatial.first.event..non.state.+Temp.spatial.last.event...50km.+Temp.spatial.last.event..state..50km.+Temp.spatial.last.event..non.state.+log(Total.population_x)+Black.or.African.American_x + White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
+###################
+#split-models
+###################
 
 
 blm$year_synth <- base::as.Date(paste("01-01-",as.character(2000+blm$Weeks.since.GF),sep=""),"%m-%d-%Y")
@@ -71,7 +66,7 @@ blm <- add_duration(blm, y="Protest._x", unitID = "NAME10_x", tID = "year_synth"
 
 blm <- blm[is.na(blm$White_x)==FALSE,]
 
-weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.population_x.log+
+sp_weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.population_x.log+
 													Temp.spatial.first.event..state..50km.*Total.population_x.log+
 													Temp.spatial.first.event..non.state.*Total.population_x.log+
 													Black.or.African.American_x+ 
@@ -79,106 +74,18 @@ weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.populatio
 													
 
 
+source('~/Documents/git/Protest_Diffusion/sp_weib_model_plot.R', chdir = TRUE)
 
 
-model.data <- model.frame(duration ~  Temp.spatial.first.event...50km.*Total.population_x.log+
+ 
+sp_loglog_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.population_x.log+
 													Temp.spatial.first.event..state..50km.*Total.population_x.log+
 													Temp.spatial.first.event..non.state.*Total.population_x.log+
 													Black.or.African.American_x+ 
-													White_x+Median.age..years._x,data = blm)
-
-plot.data <- model.data %>%
-				summarise(Temp.spatial.first.event...50km.=mean(Temp.spatial.first.event...50km.),
-													Temp.spatial.first.event..state..50km.= mean(Temp.spatial.first.event..state..50km.),
-													Temp.spatial.first.event..non.state. = mean(Temp.spatial.first.event..non.state.),
-													Total.population_x.log = mean(Total.population_x.log),
-													Black.or.African.American_x = mean(Black.or.African.American_x),
-													White_x = mean(White_x),
-													Median.age..years._x = mean(Median.age..years._x))
-					
-			plot.list <- list()
-				for(i in 1:100){
-					plot.list[[i]] <- plot.data
-				}
-			
-			plot.data <- bind_rows(plot.list)		
-
-				plot.data$Temp.spatial.first.event...50km. <- seq(min(model.data$Temp.spatial.first.event...50km.),max(model.data$Temp.spatial.first.event...50km.),length=100)
-
-
-plot.data$atrisk <- 1
-plot.data$cured <- 0
-plot.data$t.0 <- 5
-plot.data$duration <- 6
-plot.data$ongoing <- 0
-plot.data$end.spell <- 1
-plot.data$censor <- 0
-plot.data$failure <- 1
-plot.data$fit <- predict(weib_model,newdata=plot.data)
-
-
-#plot.data$se.fit <- pred.model$se.fit
-#plot.data$hi95 <- plot.data$fit+1.96*plot.data$se.fit
-#plot.data$lo95 <- plot.data$fit-1.96*plot.data$se.fit
-
-
-p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event...50km.))+
-		#geom_point()+
-			geom_line()+
-				#geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
-					theme_minimal()
-
-
-
-
-
-
-
-
-test <- predict(weib_model)	 
-loglog_model <- spdur(duration ~  Temp.spatial.first.event...50km.+
-													Temp.spatial.first.event..state..50km.+
-													Temp.spatial.first.event..non.state.+
-													log(Total.population_x)+
-													I(Temp.spatial.first.event...50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..state..50km.*log(Total.population_x))+
-													I(Temp.spatial.first.event..non.state.*log(Total.population_x)), atrisk ~ 1 ,data = blm, distr = "loglog")
+													White_x+Median.age..years._x, atrisk ~ 1 ,data = blm, distr = "loglog")
 													
 													
-weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x+Protests.same.state.past.week...50km_x+log(Total.population_x), atrisk ~ 1 ,data = blm, distr = "weibull")
-
-weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x+Protests.same.state.past.week...50km_x+Protests.past.week.not.same.state_x+log(Total.population_x)+Median.age..years._x, atrisk ~ 1 + log(Total.population_x) +White_x,data = blm, distr = "weibull")
-
-summary(weib_model)
-
-weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x+Protests.same.state.past.week...50km_x+Protests.past.week.not.same.state_x+log(Total.population_x)+Median.age..years._x, atrisk ~ 1 + log(Total.population_x) +White_x,data = blm, distr = "loglog")
-
-summary(weib_model)
-
-
-
-weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x*log(Total.population_x)+Protests.same.state.past.week...50km_x*log(Total.population_x)+Protests.past.week.not.same.state_x*log(Total.population_x)+Median.age..years._x, atrisk ~ 1 + log(Total.population_x) +White_x,data = blm, distr = "weibull")
-
-summary(weib_model)
-
-weib_model <- spdur(duration ~  Black.or.African.American_x+Protests.under.50km.past.week_x*log(Total.population_x)+Protests.same.state.past.week...50km_x*log(Total.population_x)+Protests.past.week.not.same.state_x*log(Total.population_x)+Median.age..years._x, atrisk ~ 1 + log(Total.population_x) +White_x,data = blm, distr = "loglog")
-
-summary(weib_model)
-
-
-
-
-# SURVIVAL MODEL
-
-surv_model = coxph(Surv(Weeks.since.GF, Protest._x) - Total.population_x*Protests.under.50km.past.week_x + Total.population_x*Protests.same.state.past.week...50km_x +
-               Total.population_x*Protests.past.week.not.same.state_x + 
-               Black.or.African.American_x + White_x +
-               Median.age..years._x + HBCU_x + Total.housing.units_x, data = blm)
-summary(surv_model)
-
-surv_model = coxph(Surv(Weeks.since.GF, Protest._x) - 1, blm)
-summary(surv_model)
-
+source('~/Documents/git/Protest_Diffusion/sp_loglog_model_plot.R', chdir = TRUE)
 
 
 
