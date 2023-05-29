@@ -5,6 +5,8 @@ library(survival)
 library(spduration)
 options(scipen=999)
 library(simPH)
+library(texreg)
+library(xtable)
 
 blm <- read.csv("~/Downloads/blm_weekly_first_gf-2.csv")
 
@@ -17,10 +19,10 @@ blm$start.date <- blm$Weeks.since.GF-1
 blm$end.date <- blm$Weeks.since.GF
 
 
-surv_model.1.all <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event..all.*blm$Total.population_x.log+
+surv_model.1.all <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event..all.*Total.population_x.log+
 													Black.or.African.American_x+ 
 													White_x+Median.age..years._x, data = blm[blm$Not.immune==1,])
-summary(surv_model)
+summary(surv_model.1.all)
 
 
 surv_model.1.cat <- coxph(Surv(start.date,end.date,Protest._x) ~ Temp.spatial.first.event...50km.+
@@ -70,7 +72,12 @@ sp_weib_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.popula
 													Temp.spatial.first.event..state..50km.*Total.population_x.log+
 													Temp.spatial.first.event..non.state.*Total.population_x.log+
 													Black.or.African.American_x+ 
-													White_x+Median.age..years._x, atrisk ~ 1 ,data = blm, distr = "weibull")
+													White_x+Median.age..years._x, atrisk ~ Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x ,data = blm, distr = "weibull")
+
 													
 
 
@@ -82,9 +89,16 @@ sp_loglog_model <- spdur(duration ~  Temp.spatial.first.event...50km.*Total.popu
 													Temp.spatial.first.event..state..50km.*Total.population_x.log+
 													Temp.spatial.first.event..non.state.*Total.population_x.log+
 													Black.or.African.American_x+ 
-													White_x+Median.age..years._x, atrisk ~ 1 ,data = blm, distr = "loglog")
-													
-													
+													White_x+Median.age..years._x, atrisk ~ Temp.spatial.first.event...50km.*Total.population_x.log+
+													Temp.spatial.first.event..state..50km.*Total.population_x.log+
+													Temp.spatial.first.event..non.state.*Total.population_x.log+
+													Black.or.African.American_x+ 
+													White_x+Median.age..years._x ,data = blm, distr = "loglog")
+
+
+
+
+
 source('~/Documents/git/Protest_Diffusion/sp_loglog_model_plot.R', chdir = TRUE)
 
 

@@ -52,13 +52,13 @@ plot.data <- bind_rows(plot.data.1,plot.data.2)
 
 plot.data$atrisk <- 1
 plot.data$cured <- 0
-plot.data$t.0 <- 5
-plot.data$duration <- 6
+plot.data$t.0 <- 2
+plot.data$duration <- 3
 plot.data$ongoing <- 0
 plot.data$end.spell <- 1
 plot.data$censor <- 0
 plot.data$failure <- 1
-plot.data$fit <- predict(sp_weib_model,newdata=plot.data,type="conditional hazard")
+plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="conditional hazard")
 
 
 plot.data$Population <- as.factor(plot.data$Total.population_x.log)
@@ -71,7 +71,7 @@ p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event...50km.,group=P
 					scale_colour_discrete(labels = c("Low", "High"))+
 					 ylab("Risk")+ xlab("Distance to first event within 50km")+theme_minimal()
 
-ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_weib_cat_1.pdf",p1, width = 9, height = 9, units = c("cm"))
+ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_loglog_cat_1Closer.pdf",p1, width = 9, height = 9, units = c("cm"))
 
 
 ######################################
@@ -121,13 +121,13 @@ plot.data <- bind_rows(plot.data.1,plot.data.2)
 
 plot.data$atrisk <- 1
 plot.data$cured <- 0
-plot.data$t.0 <- 5
-plot.data$duration <- 6
+plot.data$t.0 <- 2
+plot.data$duration <- 3
 plot.data$ongoing <- 0
 plot.data$end.spell <- 1
 plot.data$censor <- 0
 plot.data$failure <- 1
-plot.data$fit <- predict(sp_weib_model,newdata=plot.data,type="conditional hazard")
+plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="conditional hazard")
 
 
 plot.data$Population <- as.factor(plot.data$Total.population_x.log)
@@ -140,7 +140,7 @@ p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event..state..50km.,g
 					scale_colour_discrete(labels = c("Low", "High"))+
 					 ylab("Risk")+ xlab("Distance to first event within 50km")+theme_minimal()
 
-ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_weib_cat_2.pdf",p1, width = 9, height = 9, units = c("cm"))
+ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_loglog_cat_2Closer.pdf",p1, width = 9, height = 9, units = c("cm"))
 
 
 ######################################
@@ -190,13 +190,13 @@ plot.data <- bind_rows(plot.data.1,plot.data.2)
 
 plot.data$atrisk <- 1
 plot.data$cured <- 0
-plot.data$t.0 <- 5
-plot.data$duration <- 6
+plot.data$t.0 <- 2
+plot.data$duration <- 3
 plot.data$ongoing <- 0
 plot.data$end.spell <- 1
 plot.data$censor <- 0
 plot.data$failure <- 1
-plot.data$fit <- predict(sp_weib_model,newdata=plot.data,type="conditional hazard")
+plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="conditional hazard")
 
 
 plot.data$Population <- as.factor(plot.data$Total.population_x.log)
@@ -209,7 +209,7 @@ p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event..non.state.,gro
 					scale_colour_discrete(labels = c("Low", "High"))+
 					 ylab("Risk")+ xlab("Distance to first event within 50km")+theme_minimal()
 
-ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_weib_cat_3.pdf",p1, width = 9, height = 9, units = c("cm"))
+ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_loglog_cat_3Closer.pdf",p1, width = 9, height = 9, units = c("cm"))
 
 
 

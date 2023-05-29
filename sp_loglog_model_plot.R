@@ -58,7 +58,7 @@ plot.data$ongoing <- 0
 plot.data$end.spell <- 1
 plot.data$censor <- 0
 plot.data$failure <- 1
-plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="response")
+plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="conditional hazard")
 
 
 plot.data$Population <- as.factor(plot.data$Total.population_x.log)
@@ -127,7 +127,7 @@ plot.data$ongoing <- 0
 plot.data$end.spell <- 1
 plot.data$censor <- 0
 plot.data$failure <- 1
-plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="response")
+plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="conditional hazard")
 
 
 plot.data$Population <- as.factor(plot.data$Total.population_x.log)
@@ -196,7 +196,7 @@ plot.data$ongoing <- 0
 plot.data$end.spell <- 1
 plot.data$censor <- 0
 plot.data$failure <- 1
-plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="response")
+plot.data$fit <- predict(sp_loglog_model,newdata=plot.data, type="conditional hazard")
 
 
 plot.data$Population <- as.factor(plot.data$Total.population_x.log)
