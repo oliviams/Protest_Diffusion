@@ -138,7 +138,7 @@ p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event..state..50km.,g
 				#geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
 					scale_fill_discrete(labels = c("Low", "High"))+
 					scale_colour_discrete(labels = c("Low", "High"))+
-					 ylab("Risk")+ xlab("Distance to first event within 50km")+theme_minimal()
+					 ylab("Risk")+ xlab("Distance to first event within state")+theme_minimal()
 
 ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_loglog_cat_2Closer.pdf",p1, width = 9, height = 9, units = c("cm"))
 
@@ -207,7 +207,7 @@ p1 <- ggplot(data=plot.data,aes(y=fit,x=Temp.spatial.first.event..non.state.,gro
 				#geom_ribbon(aes(ymin=lo95,ymax=hi95),alpha=0.3,linetype=0)+
 					scale_fill_discrete(labels = c("Low", "High"))+
 					scale_colour_discrete(labels = c("Low", "High"))+
-					 ylab("Risk")+ xlab("Distance to first event within 50km")+theme_minimal()
+					 ylab("Risk")+ xlab("Distance to first event outside state")+theme_minimal()
 
 ggsave("~/Dropbox/Apps/Overleaf/Protest Diffusion (BLM & Alt-Right)/figures/sp_loglog_cat_3Closer.pdf",p1, width = 9, height = 9, units = c("cm"))
 
